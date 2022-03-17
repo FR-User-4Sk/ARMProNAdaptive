@@ -1,0 +1,67 @@
+#include "main.h"
+
+
+void DelayMilliSeconds ( int delay) {
+   int i;
+   for ( ; delay > 0 ; delay --) {
+      for ( i=0 ; i <3195 ; i++ ) {
+      }
+   }
+}
+
+void led_blink (void) {
+    GPIOA -> BSRR = GPIOA -> BSRR | 0x200000 ;  //write '0',  LED off
+    DelayMilliSeconds (200);
+    GPIOA -> BSRR = GPIOA -> BSRR | 0x20 ;  // write ‘1’ , LED on
+    DelayMilliSeconds (200);
+    GPIOA -> BSRR = GPIOA -> BSRR | 0x200000 ;  //write '0'
+}
+
+int main(void)
+{
+  /* USER CODE BEGIN 1 */
+  unsigned short result=0, result2=0 ;
+
+  RCC->CFGR = 0x57C0400 ; // ADC 4MHz < 14MHz
+  RCC->APB2ENR |= 0x00000200 ;   //ADC1 clock enable
+  RCC->APB2ENR |= 0x1 ;  // AFIO enable clock
+
+  ADC1->CR2 = 0x1 ; // enable ADC1, ADON, AD converter on ;
+  DelayMilliSeconds (1);
+  ADC1->CR2 |= 0x4 ;  // ADC1 Calibration, bit2,  CAL, if completed clear
+  while (ADC1->CR2 & 0x4) ; // calibration is doing
+
+  RCC->APB2ENR |= 0x4 ; //enable GPIOA clock  bit2
+  GPIOA->CRL &= 0xFFFFFF0F  ; // pin1 clear, set analog mode PA1
+
+  GPIOA->CRL &= 0xFF0FFFFF ;  //PA5 pin5 clear
+  GPIOA->CRL |= 0x00100000 ; // PA5 pin5 config
+
+
+  ADC1->CR1 = 0x0 ; //default scan x, dual x, interrupt X ..
+  ADC1->CR2 |= 0x009E0001;  // bit0 : ADON,  bit1 : continuous, bit
+                            // temperature,  event: swstart,
+
+  ADC1->SQR1 = 0x0 ; // regular channel sequence length = 0, one conversion, channel 1
+  ADC1->SMPR2 = 0x8 ; // sample time reg. ch1, 001,  7.5cycle
+
+  ADC1->SQR3 = 0x1 ; // AD convert squences from 1 to ...
+                     // only 1, channel #1
+
+  while (1) {
+
+      // delay time calculation
+  ADC1->CR2 |= 0x400000 ;  // swstart, conversion start
+  while ( !(ADC1->SR & 0x2)) ;  // wait for conversion end
+      result = ADC1->DR ;
+      result2 = result / 10;
+
+      // LED On
+      GPIOA -> BSRR =  0x20 ;  // write ‘1’ , LED on
+      DelayMilliSeconds (result2);
+
+  // LED off
+      GPIOA -> BSRR =  0x200000 ;  //write '0', off
+      DelayMilliSeconds (result2); //wait
+  }
+}
