@@ -1,0 +1,352 @@
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file           : main.c
+  * @brief          : Main program body
+  ******************************************************************************
+  * @attention
+  *
+  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
+  * All rights reserved.</center></h2>
+  *
+  * This software component is licensed by ST under BSD 3-Clause license,
+  * the "License"; You may not use this file except in compliance with the
+  * License. You may obtain a copy of the License at:
+  *                        opensource.org/licenses/BSD-3-Clause
+  *
+  ******************************************************************************
+  */
+/* USER CODE END Header */
+
+/* Includes ------------------------------------------------------------------*/
+#include "main.h"
+
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+#include "stdio.h"
+
+/* USER CODE END Includes */
+
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
+
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+#ifdef __GNUC__
+  /* With GCC/RAISONANCE, small printf (option LD Linker->Libraries->Small printf
+     set to 'Yes') calls __io_putchar() */
+  #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+#else
+  #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
+#endif /* __GNUC__ */
+
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Private variables ---------------------------------------------------------*/
+TIM_HandleTypeDef htim2;
+
+UART_HandleTypeDef huart2;
+
+/* USER CODE BEGIN PV */
+char Uart_Tx_Parity_Mode;
+int tim2_cnt;
+char tim2_flag;
+char tim2_trigger;
+char chUartTxData[32];
+
+/* USER CODE END PV */
+
+/* Private function prototypes -----------------------------------------------*/
+void SystemClock_Config(void);
+static void MX_GPIO_Init(void);
+static void MX_USART2_UART_Init(void);
+static void MX_TIM2_Init(void);
+/* USER CODE BEGIN PFP */
+
+/* USER CODE END PFP */
+
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
+PUTCHAR_PROTOTYPE
+{
+  /* Place your implementation of fputc here */
+  /* e.g. write a character to the EVAL_COM1 and Loop until the end of transmission */
+  HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, 0xFFFF);
+
+  return ch;
+}
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	if(htim->Instance == htim2.Instance){
+		//HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
+		if('y' == tim2_flag){
+			tim2_cnt += 1;
+			tim2_trigger = 'y';
+		}
+	}
+}
+
+void Uart_Tx_Byte(char TxData, char Parity)
+{
+	char chExit = 'n';
+	char chComp = 0x01;
+	int ParityBit_cnt = 0;
+
+	tim2_cnt = 0;
+	tim2_flag = 'y';
+	tim2_trigger = 'n';
+
+	while(1){
+		if(('y' == tim2_trigger) && (tim2_cnt == 1)){ // idle
+			tim2_trigger = 'n';
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
+		}else if(('y' == tim2_trigger) && (tim2_cnt == 2)){ // start
+			tim2_trigger = 'n';
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
+		}else if(('y' == tim2_trigger) && (tim2_cnt == 3)){ // bit 0
+			tim2_trigger = 'n';
+			if((TxData & chComp) == chComp){
+				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
+				ParityBit_cnt += 1;
+			}else{
+				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
+			}
+			chComp <<= 1;
+		}else if(('y' == tim2_trigger) && (tim2_cnt == 4)){ // bit 1
+			tim2_trigger = 'n';
+			if((TxData & chComp) == chComp){
+				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
+				ParityBit_cnt += 1;
+			}else{
+				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
+			}
+			chComp <<= 1;
+		}else if(('y' == tim2_trigger) && (tim2_cnt == 5)){ // bit 2
+			tim2_trigger = 'n';
+			if((TxData & chComp) == chComp){
+				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
+				ParityBit_cnt += 1;
+			}else{
+				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
+			}
+			chComp <<= 1;
+		}else if(('y' == tim2_trigger) && (tim2_cnt == 6)){ // bit 3
+			tim2_trigger = 'n';
+			if((TxData & chComp) == chComp){
+				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
+				ParityBit_cnt += 1;
+			}else{
+				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
+			}
+			chComp <<= 1;
+		}else if(('y' == tim2_trigger) && (tim2_cnt == 7)){ // bit 4
+			tim2_trigger = 'n';
+			if((TxData & chComp) == chComp){
+				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
+				ParityBit_cnt += 1;
+			}else{
+				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
+			}
+			chComp <<= 1;
+		}else if(('y' == tim2_trigger) && (tim2_cnt == 8)){ // bit 5
+			tim2_trigger = 'n';
+			if((TxData & chComp) == chComp){
+				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
+				ParityBit_cnt += 1;
+			}else{
+				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
+			}
+			chComp <<= 1;
+		}else if(('y' == tim2_trigger) && (tim2_cnt == 9)){ // bit 6
+			tim2_trigger = 'n';
+			if((TxData & chComp) == chComp){
+				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
+				ParityBit_cnt += 1;
+			}else{
+				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
+			}
+			chComp <<= 1;
+		}else if(('y' == tim2_trigger) && (tim2_cnt == 10)){ // bit 7
+			tim2_trigger = 'n';
+			if((TxData & chComp) == chComp){
+				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
+				ParityBit_cnt += 1;
+			}else{
+				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
+			}
+			chComp <<= 1;
+		}else if(       ){ // [parity : none/even/odd] or [stop]
+
+			//----- 이 부분부터 수정 및 추가 필요 ------------------------------------------
+			//----- parity bit & stop bit 전송부분 추가 -------------------------------------
+
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
+			chExit = 'y';
+
+		}else if(       ){ // stop
+
+			//----- 이 부분부터 수정 및 추가 필요 ------------------------------------------
+			//----- parity bit & stop bit 전송부분 추가 -------------------------------------
+
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
+			chExit = 'y';
+
+		}
+		if(('y' == tim2_trigger) && ('y' == chExit)){
+			tim2_trigger = 'n';
+			tim2_flag = 'n';
+			break;
+		}
+	}
+}
+
+int Uart_Tx_multiByte(int Tx_cnt, char* TxData, char Parity)
+{
+	int m;
+
+	for(m = 0; m < Tx_cnt; m++){
+		Uart_Tx_Byte(TxData[m], Parity);
+	}
+
+	return(0);
+}
+
+
+
+/* USER CODE END 0 */
+
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
+int main(void)
+{
+  /* USER CODE BEGIN 1 */
+
+	HAL_StatusTypeDef tim2_it_start;
+	GPIO_PinState pc13pin;
+	GPIO_PinState pa8pin, pb8pin;
+
+  /* USER CODE END 1 */
+
+  /* MCU Configuration--------------------------------------------------------*/
+
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  HAL_Init();
+
+  /* USER CODE BEGIN Init */
+
+  /* USER CODE END Init */
+
+  /* Configure the system clock */
+  SystemClock_Config();
+
+  /* USER CODE BEGIN SysInit */
+
+  /* USER CODE END SysInit */
+
+  /* Initialize all configured peripherals */
+  MX_GPIO_Init();
+  MX_USART2_UART_Init();
+  MX_TIM2_Init();
+  /* USER CODE BEGIN 2 */
+
+  printf("---uart tx mode\r\n---");
+
+  Uart_Tx_Parity_Mode = 'n'; // 'n':none, 'e':even, 'o':odd
+  tim2_cnt = 0;
+  tim2_flag = 'n';
+  tim2_trigger = 'n';
+
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
+
+  tim2_it_start = HAL_TIM_Base_Start_IT(&htim2);
+  if(HAL_OK == tim2_it_start){
+	  printf("HAL_TIM_Base_Start_IT OK\r\n");
+  }else{
+	  printf("HAL_TIM_Base_Start_IT error\r\n");
+  }
+
+  chUartTxData[0] = 'a';
+
+  /* USER CODE END 2 */
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+  while (1)
+  {
+    /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
+
+	  //----- one byte -----
+	  pc13pin = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13);
+	  if(GPIO_PIN_RESET == pc13pin){
+		  pa8pin = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_8);
+		  pb8pin = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_8);
+		  if((GPIO_PIN_SET == pa8pin) && (GPIO_PIN_RESET == pb8pin)){
+			  Uart_Tx_Parity_Mode = 'e';
+		  }else if((GPIO_PIN_RESET == pa8pin) && (GPIO_PIN_SET == pb8pin)){
+			  Uart_Tx_Parity_Mode = 'o';
+		  }else{
+			  Uart_Tx_Parity_Mode = 'n';
+		  }
+		  Uart_Tx_Byte(chUartTxData[0], Uart_Tx_Parity_Mode);
+		  printf("Uart_Tx_Byte=%c[0x%02x]---parity=%c---\r\n",chUartTxData[0],chUartTxData[0],Uart_Tx_Parity_Mode);
+		  if('z' == chUartTxData[0]){
+			  chUartTxData[0] = 'a';
+		  }else{
+			  chUartTxData[0] += 1;
+		  }
+	  }
+	  //----- one byte -----
+
+
+	  /*
+	  //----- multi byte -----
+	  pc13pin = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13);
+	  if(GPIO_PIN_RESET == pc13pin){
+		  //chUartTxData[0]
+		  chUartTxData[1] = (chUartTxData[0] + 1);
+		  chUartTxData[2] = (chUartTxData[1] + 1);
+		  chUartTxData[3] = (chUartTxData[2] + 1);
+		  chUartTxData[4] = (chUartTxData[3] + 1);
+		  pa8pin = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_8);
+		  pb8pin = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_8);
+		  if((GPIO_PIN_SET == pa8pin) && (GPIO_PIN_RESET == pb8pin)){
+			  Uart_Tx_Parity_Mode = 'e';
+		  }else if((GPIO_PIN_RESET == pa8pin) && (GPIO_PIN_SET == pb8pin)){
+			  Uart_Tx_Parity_Mode = 'o';
+		  }else{
+			  Uart_Tx_Parity_Mode = 'n';
+		  }
+		  Uart_Tx_multiByte(5, chUartTxData, Uart_Tx_Parity_Mode); // 'n':none, 'e':even, 'o':odd
+		  printf("Uart_Tx_Byte=%c[0x%02x]---parity=%c---\r\n",chUartTxData[0],chUartTxData[0],Uart_Tx_Parity_Mode);
+		  printf("Uart_Tx_Byte=%c[0x%02x]---parity=%c---\r\n",chUartTxData[1],chUartTxData[1],Uart_Tx_Parity_Mode);
+		  printf("Uart_Tx_Byte=%c[0x%02x]---parity=%c---\r\n",chUartTxData[2],chUartTxData[2],Uart_Tx_Parity_Mode);
+		  printf("Uart_Tx_Byte=%c[0x%02x]---parity=%c---\r\n",chUartTxData[3],chUartTxData[3],Uart_Tx_Parity_Mode);
+		  printf("Uart_Tx_Byte=%c[0x%02x]---parity=%c---\r\n",chUartTxData[4],chUartTxData[4],Uart_Tx_Parity_Mode);
+		  if('z' == chUartTxData[0]){
+			  chUartTxData[0] = 'a';
+		  }else{
+			  chUartTxData[0] += 1;
+		  }
+		  HAL_Delay(500);
+	  }
+	  //----- multi byte -----
+	  */
+
+	  HAL_Delay(200);
+	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+
+  }
+  /* USER CODE END 3 */
+}

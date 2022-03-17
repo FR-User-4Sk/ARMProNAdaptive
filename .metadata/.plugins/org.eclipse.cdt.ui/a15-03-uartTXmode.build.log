@@ -1,0 +1,19 @@
+11:22:59 **** Incremental Build of configuration Release for project a15-03-uartTXmode ****
+make -j16 all 
+arm-none-eabi-gcc -o "a15-03-uartTXmode.elf" @"objects.list"   -mcpu=cortex-m3 -T"C:\ljh\a15-03-uartTXmode\STM32F103RBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="a15-03-uartTXmode.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: a15-03-uartTXmode.elf
+ 
+arm-none-eabi-size   a15-03-uartTXmode.elf 
+arm-none-eabi-objdump -h -S  a15-03-uartTXmode.elf  > "a15-03-uartTXmode.list"
+arm-none-eabi-objcopy  -O binary  a15-03-uartTXmode.elf  "a15-03-uartTXmode.bin"
+   text	   data	    bss	    dec	    hex	filename
+   9508	    120	   1768	  11396	   2c84	a15-03-uartTXmode.elf
+Finished building: default.size.stdout
+ 
+Finished building: a15-03-uartTXmode.bin
+ 
+Finished building: a15-03-uartTXmode.list
+ 
+
+11:23:00 Build Finished. 0 errors, 0 warnings. (took 482ms)
+

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Delete resource &apos;a15-03-uartTXmode/Core/Src/externalsource.c&apos;" deleteContents="false" description="Delete resource &apos;a15-03-uartTXmode/Core/Src/externalsource.c&apos;" element1="/a15-03-uartTXmode/Core/Src/externalsource.c" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1647483776593"/>
+</session>
