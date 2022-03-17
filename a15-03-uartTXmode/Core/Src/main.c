@@ -188,16 +188,35 @@ void Uart_Tx_Byte(char TxData, char Parity)
 			}
 			chComp <<= 1;
 		}
-		/*
-		else if(       ){ // [parity : none/even/odd] or [stop]
+		else if(('y' == tim2_trigger) && (tim2_cnt == 11)){ // [parity : none/even/odd] or [stop]
+			tim2_trigger = 'n';
+
+			if(Parity == 'n'){
+				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
+				chExit = 'y';
+			}else if(Parity == 'e'){
+				if((ParityBit_cnt % 2) == 0){
+					HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
+				}else{
+					HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
+				}
+
+			}else if(Parity == 'o'){
+				if((ParityBit_cnt % 2) == 1){
+					HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
+				}else{
+					HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
+				}
+			}
+
 
 			//----- 이 부분부터 수정 및 추가 필요 ------------------------------------------
 			//----- parity bit & stop bit 전송부분 추가 -------------------------------------
 
-			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
-			chExit = 'y';
 
-		}else if(       ){ // stop
+
+
+		}else if(('y' == tim2_trigger) && (tim2_cnt == 12)){ // stop
 
 			//----- 이 부분부터 수정 및 추가 필요 ------------------------------------------
 			//----- parity bit & stop bit 전송부분 추가 -------------------------------------
@@ -206,7 +225,6 @@ void Uart_Tx_Byte(char TxData, char Parity)
 			chExit = 'y';
 
 		}
-		*/
 		if(('y' == tim2_trigger) && ('y' == chExit)){
 			tim2_trigger = 'n';
 			tim2_flag = 'n';

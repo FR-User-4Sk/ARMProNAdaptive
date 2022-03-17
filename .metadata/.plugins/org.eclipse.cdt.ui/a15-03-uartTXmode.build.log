@@ -1,10 +1,10 @@
-11:52:11 **** Incremental Build of configuration Release for project a15-03-uartTXmode ****
+12:15:50 **** Incremental Build of configuration Release for project a15-03-uartTXmode ****
 make -j16 all 
 arm-none-eabi-size   a15-03-uartTXmode.elf 
    text	   data	    bss	    dec	    hex	filename
-   9536	    120	   1768	  11424	   2ca0	a15-03-uartTXmode.elf
+   9720	    120	   1768	  11608	   2d58	a15-03-uartTXmode.elf
 Finished building: default.size.stdout
  
 
-11:52:11 Build Finished. 0 errors, 0 warnings. (took 330ms)
+12:15:51 Build Finished. 0 errors, 0 warnings. (took 331ms)
 
