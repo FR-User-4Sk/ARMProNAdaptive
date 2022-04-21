@@ -1,0 +1,17 @@
+main.c:183:1:__io_putchar	16	static
+main.c:194:6:HAL_GPIO_EXTI_Callback	16	static
+main.c:233:6:HAL_TIM_PeriodElapsedCallback	16	static
+main.c:386:6:initFunction	16	static
+main.c:462:6:runningChecker	8	static
+main.c:468:6:scanParity	8	static
+main.c:486:6:sendGradualChar	8	static
+main.c:503:6:doUS100	16	static
+main.c:545:6:Uart_Tx_Byte	24	static
+main.c:672:5:Uart_Tx_multiByte	32	static
+main.c:694:5:main	8	static
+main.c:752:6:SystemClock_Config	72	static
+main.c:789:13:MX_TIM2_Init	32	static
+main.c:834:13:MX_TIM3_Init	32	static
+main.c:879:13:MX_USART2_UART_Init	8	static
+main.c:912:13:MX_GPIO_Init	40	static
+main.c:961:6:Error_Handler	4	static
