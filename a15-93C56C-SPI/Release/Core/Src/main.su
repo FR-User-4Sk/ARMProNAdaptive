@@ -1,0 +1,12 @@
+main.c:108:1:__io_putchar	16	static
+main.c:116:6:HAL_TIM_PeriodElapsedCallback	8	static
+main.c:148:5:setCS	8	static
+main.c:152:5:setCLK	8	static
+main.c:156:5:setDI	8	static
+main.c:164:5:spi_93c56c_EWEN	64	static
+main.c:309:5:spi_93c56c_WRITE	64	static
+main.c:444:5:spi_93c56c_READ	72	static
+main.c:605:6:HAL_GPIO_EXTI_Callback	0	static
+main.c:763:6:SystemClock_Config	72	static
+main.c:635:5:main	64	static
+main.c:944:6:Error_Handler	0	static
